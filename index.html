@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<script>
+
+//js calls come here
+</script>
+<head>
+<style type="text/css">
+	
+	body {
+    margin:0;
+	}
+
+    #map {
+    height: 450px;
+    width: 100%;
+    }
+
+    button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    width: 25%;
+    float: left;
+	}
+	
+    .btn-btn-upload {
+    background-color: #FFFFFF; /* White */
+    border: 2px solid #555555; /* Black */
+    color: black;
+	}
+
+	.btn-btn-upload:hover {
+	background-color: #3e8e41;
+	}
+
+	.button:hover {
+    background-color: #3e8e41;
+    border: 1px solid #FFFFFF;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+	}
+
+</style>
+</head>
+<body>
+
+<button class="button">Cluster</button>
+<button class="button">Salesman</button>
+<button class="button">Travel</button>
+<button class="button">Social</button>
+<div id="map"></div>
+    <script>
+      function initMap() {
+        var uluru = {lat: -25.363, lng: 131.044};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: uluru
+        });
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+    </script>
+    <button class="btn-btn-upload" style="position:relative; left:37.5%">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 32 32">
+    <path d="M14 18h4v-8h6l-8-8-8 8h6zM20 13.5v3.085l9.158 3.415-13.158 4.907-13.158-4.907 9.158-3.415v-3.085l-12 4.5v8l16 6 16-6v-8z"></path>
+    </svg>&nbsp;Upload</button>
+</body>
+</html>
