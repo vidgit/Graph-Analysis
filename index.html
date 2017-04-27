@@ -108,7 +108,9 @@
             map: map
         });
         map.panTo(latLng);
-        locations.push(marker.getPosition().toString());
+        var value = marker.getPosition().toString().replace(/[()]/g, '').split(",");
+        var pushvalue = '{lat:'+value[0].slice(0,9)+', lng:'+value[1].slice(0,10)+'}';
+        locations.push(pushvalue);
       }
 
       //save file
@@ -133,7 +135,7 @@
 		
 	  */
       var locations = [
-        {lat: 15.390055, lng: 73.876372},
+        /*{lat: 15.390055, lng: 73.876372},
 		{lat: 15.390407, lng: 73.876671},
 		{lat: 15.390752, lng: 73.877022},
 		{lat: 15.391036, lng: 73.877387},
@@ -141,7 +143,7 @@
 		{lat: 15.392210, lng: 73.878529},
 		{lat: 15.392231, lng: 73.877539},
 		{lat: 15.391698, lng: 73.877029},
-		{lat: 15.390417, lng: 73.880622},
+		{lat: 15.390417, lng: 73.880622},*/
       ]
       
     </script>
