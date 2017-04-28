@@ -80,7 +80,7 @@
 
         // Create an array of alphabetical characters used to label the markers.
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
+        
         // Add some markers to the map.
         // Note: The code uses the JavaScript Array.prototype.map() method to
         // create an array of markers based on a given "locations" array.
@@ -97,10 +97,10 @@
             {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
         
         map.addListener('click', function(e) {
+
             placeMarkerAndPanTo(e.latLng, map);
         });
       }
-
       // Adds a marker to the map and push to the array.
       function placeMarkerAndPanTo(latLng, map) {
         var marker = new google.maps.Marker({
@@ -109,7 +109,8 @@
         });
         map.panTo(latLng);
         var value = marker.getPosition().toString().replace(/[()]/g, '').split(",");
-        var pushvalue = '{lat:'+value[0].slice(0,9)+', lng:'+value[1].slice(0,10)+'}';
+        var number = locations.length+1;
+        var pushvalue = "'"+number+"':{'name':"+number+"','lat':"+value[0].slice(0,5)+", 'lng':"+value[1].slice(1,6)+",'isClustered':false,'isClusterhead':false,'clusterNo':-1,'edges':[]}";
         locations.push(pushvalue);
       }
 
@@ -117,6 +118,7 @@
       function save() {
         var textToSave = JSON.stringify(locations),
             filename = 'file.txt',
+            //textToSave.replace(/\\/g, "");
             blob = new Blob([textToSave], {type: "text/plain;charset=utf-8"});
 
         saveAs(blob, filename);
