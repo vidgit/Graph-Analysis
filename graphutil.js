@@ -1,4 +1,4 @@
-var radius = 3000;
+var radius = 30000;
 var points=[];
 var size = Object.keys(points).length;
 var edges=[];
@@ -29,6 +29,7 @@ function _cluster(){
         value.isClustered=true;
         //alert(value.isClustered);
         value.isClusterhead=true;
+        value.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
         clusterHeads.push(value);
         var newClus=[];
         newClus.push(value);
