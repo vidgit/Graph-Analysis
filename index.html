@@ -72,38 +72,49 @@
     <script src="FileSaver.min.js"></script>
     <script>
 
+      var dd,ds;
+      var map;
       function initMap() {
 
         var mapstart = {lat: 15.390649, lng: 73.878237};
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var directionsService = new google.maps.DirectionsService;
+        dd=directionsDisplay;
+        ds=directionsService;
 
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 17,
-          center: mapstart
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: mapstart,
+          mapTypeId: 'terrain'
         });
+        // uncomment for directions display
+        directionsDisplay.setMap(map);
 
         // Create an array of alphabetical characters used to label the markers.
-        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        //var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         
         // Add some markers to the map.
         // Note: The code uses the JavaScript Array.prototype.map() method to
         // create an array of markers based on a given "locations" array.
         // The map() method here has nothing to do with the Google Maps API.
-        var markers = locations.map(function(location, i) {
+        /*var markers = locations.map(function(location, i) {
           return new google.maps.Marker({
             position: location,
             label: labels[i % labels.length]
           });
-        });
+        });*/
 
         // Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(map, markers,
-            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+        //var markerCluster = new MarkerClusterer(map, markers,
+            //{imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
         
         map.addListener('click', function(e) {
 
             placeMarkerAndPanTo(e.latLng, map);
         });
       }
+
+
       // Adds a marker to the map and push to the array.
       function placeMarkerAndPanTo(latLng, map) {
         var marker = new google.maps.Marker({
@@ -129,6 +140,40 @@
         points.push(point);
       }
 
+      function createLine(p1,p2)
+    {
+            var route = [{lat: parseFloat(p1.lat), lng: parseFloat(p1.long)},{lat: parseFloat(p2.lat), lng: parseFloat(p2.long)}];
+            var polyline = new google.maps.Polyline({
+                path: route,
+                geodesic: true,
+                strokeColor: "#ff0000",
+                strokeOpacity: 0.6,
+                strokeWeight: 5
+            });
+
+            polyline.setMap(map);
+    }
+
+
+      function calculateAndDisplayRoute(p1,p2) {
+        var selectedMode = 'WALKING';
+        alert(p1.lat+","+p2.long);
+        ds.route({
+          origin: {lat: parseFloat(p1.lat), lng: parseFloat(p1.long)}, 
+          destination: {lat: parseFloat(p2.lat), lng: parseFloat(p2.long)},  
+          // Note that Javascript allows us to access the constant
+          // using square brackets and a string value as its
+          // "property."
+          travelMode: google.maps.TravelMode[selectedMode]
+        }, function(response, status) {
+          if (status == 'OK') {
+            dd.setDirections(response);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
+
       //save file
       function save() {
         var textToSave = JSON.stringify(locations),
@@ -139,29 +184,7 @@
         saveAs(blob, filename);
     }
       
-	  /*
-		{lat: 15.390055, lng: 73.876372},
-		{lat: 15.390407, lng: 73.876671},
-		{lat: 15.390752, lng: 73.877022},
-		{lat: 15.391036, lng: 73.877387},
-		{lat: 15.391936, lng: 73.878261},
-		{lat: 15.392210, lng: 73.878529},
-		{lat: 15.392231, lng: 73.877539},
-		{lat: 15.391698, lng: 73.877029},
-		{lat: 15.390417, lng: 73.880622},
-		
-	  */
-      var locations = [
-        /*{lat: 15.390055, lng: 73.876372},
-		{lat: 15.390407, lng: 73.876671},
-		{lat: 15.390752, lng: 73.877022},
-		{lat: 15.391036, lng: 73.877387},
-		{lat: 15.391936, lng: 73.878261},
-		{lat: 15.392210, lng: 73.878529},
-		{lat: 15.392231, lng: 73.877539},
-		{lat: 15.391698, lng: 73.877029},
-		{lat: 15.390417, lng: 73.880622},*/
-      ]
+      var locations = []
       function printLCL(){
     console.log(locations);
 }

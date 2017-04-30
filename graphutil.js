@@ -1,4 +1,4 @@
-var radius = 30;
+var radius = 3000;
 var points=[];
 var size = Object.keys(points).length;
 var edges=[];
@@ -82,7 +82,10 @@ function pushEdge(p1,p2,dis){
     console.log("[Edge added]");
     for (let [key, value] of Object.entries(edges)) {
         console.log(key+":"+value.from.name+":"+value.to.name+":"+value.length+",\n");
+
     }
+    createLine(p1,p2);
+    //calculateAndDisplayRoute(p1,p2);
     //console.log(edges);
 }
 
