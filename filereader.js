@@ -1,66 +1,3 @@
-var file={
-    "Name":"Title",
-    "latS": "58 N",
-    "latE": "58.5 N",
-    "lonS": "83 E",
-    "lonE": "83.5 E",
-    "points":{
-        "1":{
-            "name":"a",
-            "lat":12,
-            "long":12,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        },
-        "2":{
-            "name":"b",
-            "lat":168,
-            "long":1,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        },
-        "3":{
-            "name":"c",
-            "lat":69,
-            "long":41,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        },
-        "4":{
-            "name":"d",
-            "lat":43,
-            "long":32,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        },
-        "5":{
-            "name":"e",
-            "lat":44,
-            "long":21,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        },
-        "6":{
-            "name":"f",
-            "lat":84,
-            "long":69,
-            "isClustered":false,
-            "isClusterhead":false,
-            "clusterNo":-1,
-             "edges":[]
-        }
-    }
-}
 
 function getName(){
     console.log(file.Name);
@@ -91,7 +28,7 @@ function getpoints(){
 
 function getpointDetails(){
     var s="";
-    for (let [key, value] of Object.entries(file.points)) { 
+    for (let [key, value] of Object.entries(points)) { 
         s+=key+": {\n";
         for(let [k,v] of Object.entries(value)){
             if(k=="edges"){

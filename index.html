@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Graph Analytics</title>
 <style type="text/css">
 	
 	body {
@@ -58,9 +59,11 @@
 
 </style>
 </head>
+<script type="text/javascript" src="filereader.js"></script>
+<script type="text/javascript" src="graphutil.js"></script>
 <body>
 
-<button class="button">Cluster</button>
+<button class="button" onclick="cluster()">Cluster</button>
 <button class="button">Salesman</button>
 <button class="button">Travel</button>
 <button class="button" onclick="save()">Save</button>
@@ -109,9 +112,21 @@
         });
         map.panTo(latLng);
         var value = marker.getPosition().toString().replace(/[()]/g, '').split(",");
+        //alert(value);
         var number = locations.length+1;
-        var pushvalue = "'"+number+"':{'name':"+number+"','lat':"+value[0].slice(0,5)+", 'lng':"+value[1].slice(1,6)+",'isClustered':false,'isClusterhead':false,'clusterNo':-1,'edges':[]}";
+        var pushvalue = "'"+number+"':{'name':"+number+"','lat':"+value[0].slice(0,5)+", 'long':"+value[1].slice(1,6)+",'isClustered':false,'isClusterhead':false,'clusterNo':-1,'edges':[]}";
         locations.push(pushvalue);
+        //console.log(locations);
+        var point={
+            "name":number,
+            "lat":value[0].slice(0,5),
+            "long":value[1].slice(1,6),
+            "isClustered":false,
+            "isClusterhead":false,
+            "clusterNo":-1,
+            "edges":[]
+        };
+        points.push(point);
       }
 
       //save file
@@ -147,7 +162,9 @@
 		{lat: 15.391698, lng: 73.877029},
 		{lat: 15.390417, lng: 73.880622},*/
       ]
-      
+      function printLCL(){
+    console.log(locations);
+}
     </script>
 	<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
     </script>

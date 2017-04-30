@@ -1,5 +1,6 @@
 var radius = 30;
-var size = Object.keys(file.points).length;
+var points=[];
+var size = Object.keys(points).length;
 var edges=[];
 var clusterHeads=[];
 var clusters=[];
@@ -9,6 +10,7 @@ var once=[];
 var twice=[];
 function cluster(){
     //addPriority()
+    //alert(Object.keys(points));
     _cluster();
 }
 
@@ -18,33 +20,36 @@ function _cluster(){
     //start adding edges if distance between the points is less than radius.
     //and skip the points which have been clustered.
     var clusterNumber=0;
-    var keys = Object.keys(file.points);
-    for (let [key, value] of Object.entries(file.points)) {
+    var keys = Object.keys(points);
+    for (let [key, value] of Object.entries(points)) {
+        //alert(value.isClustered);
         if(value.isClustered){
             continue;
         }
         value.isClustered=true;
+        //alert(value.isClustered);
         value.isClusterhead=true;
         clusterHeads.push(value);
         var newClus=[];
         newClus.push(value);
         value.clusterNo=++clusterNumber;
-        for(var i=size-1;i>=0;i--){
-            var curr=file.points[keys[i]];
+        for(var i=Object.keys(points).length-1;i>=0;i--){
+            var curr=points[keys[i]];
             if(curr.isClustered)
                 continue;
-            var dis=distance(curr,value);
-            //alert(dis<=radius);
+            var dis=getDistance(curr,value);
+            alert(dis);
             if(dis<=radius)
             {
                 pushEdge(value,curr,dis);
-                file.points[keys[i]].isClustered=true;
-                file.points[keys[i]].clusterNo=clusterNumber;
+                points[keys[i]].isClustered=true;
+                points[keys[i]].clusterNo=clusterNumber;
                 newClus.push(curr);
             }
         }
         clusters.push(newClus);
-
+        console.log(getpointDetails());
+        printClusters();
     }
     
 }
@@ -84,7 +89,7 @@ function pushEdge(p1,p2,dis){
 function distance(p1,p2){
     //alert(file.points);
     var x1,x2,y1,y2;
-    for (let [key, value] of Object.entries(file.points)) {
+    for (let [key, value] of Object.entries(points)) {
     
         if(value==p1){
             x1=value.lat;
@@ -96,7 +101,7 @@ function distance(p1,p2){
         }
     }
 
-    return Math.sqrt(Math.pow((x1-x2),2)-Math.pow((y1-y2),2));
+    return Math.sqrt(Math.pow((x1-x2)*111,2)-Math.pow((y1-y2),2));
 
 }
 
@@ -112,7 +117,7 @@ function addPriority(){
     }
     //shuffle(list);
     var i=size-1;
-    for (let [key, value] of Object.entries(file.points)) {
+    for (let [key, value] of Object.entries(points)) {
         value.priority=list[i--];
     }
 }
@@ -122,18 +127,55 @@ function sortByPriority(){
 
 function printClusters(){
     for(let [key, value] of Object.entries(clusters)){
-        console.log(key+"\n");
+        console.log("Cluster No:"+key+"\n");
         for(let [k,v] of Object.entries(value)){
             console.log(v.name);
         }
     }
 }
 function tester(){
-    var p1 = file.points["1"];
+    var p1 = points["1"];
     p1.name="changed";
 }
 //addPriority();
-cluster();
+//cluster();
 //tester();
-printClusters();
+//printClusters();
+function getpointDetails(){
+    var s="";
+    //alert("here");
+    for (let [key, value] of Object.entries(points)) { 
+        s+=key+": {\n";
+        for(let [k,v] of Object.entries(value)){
+            if(k=="edges"){
+                s+="edges:{\n";
+                for(let [k1,v1] of Object.entries(value.edges)){
+                    s+=k1+":"+v1+",\n";
+                }
+                s+="}\n";
+            }
+            else
+            s+=k+" : "+v+",\n";
+        }
+        s+="}\n";
+    }
+    return s;
+}
 //console.log(getpointDetails());
+function rad(x) {
+  //alert(x+":" +(x * Math.PI / 180));
+  return x * Math.PI / 180;
+};
+
+function getDistance(p1, p2) {
+  var R = 6378137; // Earth’s mean radius in meter
+  var dLat = rad(p2.lat - p1.lat);
+  var dLong = rad(p2.long - p1.long);
+  //alert(Math.sin(dLat / 2)+"*"+ Math.sin(dLat / 2) +" + "+Math.cos(rad(p1.lat))+" * "+Math.cos(rad(p2.lat))+" * "+Math.sin(dLong / 2)+"*"+Math.sin(dLong / 2));
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(rad(p1.lat)) * Math.cos(rad(p2.lat)) *
+    Math.sin(dLong / 2) * Math.sin(dLong / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  return d; // returns the distance in meter
+};
