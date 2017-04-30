@@ -1,4 +1,4 @@
-var radius = 30000;
+var radius = 15000;
 var points=[];
 var size = Object.keys(points).length;
 var edges=[];
