@@ -5,7 +5,7 @@ var edges=[];
 var clusterHeads=[];
 var clusters=[];
 var ring=[];
-var adj=[];
+var adj={};
 var once=[];
 var twice=[];
 function cluster(){
@@ -33,18 +33,18 @@ function _cluster(){
         clusterHeads.push(value);
         var newClus=[];
         newClus.push(value);
-        value.clusterNo=++clusterNumber;
+        value.clusterNo=value.name;
         for(var i=Object.keys(points).length-1;i>=0;i--){
             var curr=points[keys[i]];
             if(curr.isClustered)
                 continue;
             var dis=getDistance(curr,value);
-            alert(dis);
+            //alert(dis);
             if(dis<=radius)
             {
                 pushEdge(value,curr,dis);
                 points[keys[i]].isClustered=true;
-                points[keys[i]].clusterNo=clusterNumber;
+                points[keys[i]].clusterNo=value.name;
                 newClus.push(curr);
             }
         }
@@ -56,20 +56,142 @@ function _cluster(){
 }
 
 function overlay(){
+    var cls=clusterHeads.slice(0);
+    cls=shuffle(cls);
+    cls.push(cls[0]);
+    var s="Path:  ";
+    for(var i=0;i<cls.length;i++){
+        s+=cls[i].name+"  ";
+    }
+    console.log(s);
     buildAdj();
-    var ka= Object.keys()
+    var queue=[];
+    var keys = Object.keys(clusterHeads);
+    //graph = new Graph(adj);
+    //console.log(graph.findShortestPath("1", "2"));
+    var visited=[];
+    //alert("!!"+clusterHeads[keys[0]].name);
+    queue.push({"point":clusterHeads[keys[0]].name,"path":[],"dis":0});
+    var pathMode=1;
+    if(pathMode==1){
+        //var path=[];
+        console.log("Path Finder");
+        while(queue.length>0){
+            queue.sort(function(p,q){
+                return p.dis-q.dis;
+            })
+            for(let [k,v] of Object.entries(queue)){
+                console.log(k+":"+"point"+v.point+" path"+v.path+" dis:"+ v.dis);
+            }
+
+            var curr=queue[0].point;
+            var path=queue[0].path;
+            var dis=queue[0].dis;
+            console.log("Current Node"+ curr+" Path"+ path+" distance:" +dis);
+            if(curr==clusterHeads[keys[keys.length-1]].name){
+                console.log("GOAL FOUND");
+                console.log("Path cost:"+dis);
+                path.push(curr);
+                printPath(path);
+                break;
+            }
+            visited.push(curr);
+            queue.splice(0,1);
+            //alert(Object.keys(adj));
+            //alert(curr);
+            //alert(Object.keys(adj)[0]);
+            var a=adj[String(curr)];
+            for(let [k,v] of Object.entries(a)){
+                console.log(k+" : "+v);
+                if(visited.indexOf(k)==-1){
+                    var pth=path.slice(0);
+                    pth.push(curr);
+                    queue.push({"point":k,"path":pth,"dis":dis+parseFloat(v)});
+                    console.log("Point Loaded");
+                    console.log({"point":k,"path":pth,"dis":dis+parseFloat(v)});
+                }
+
+            }
+        }
+    }
+    else{
+        console.log("Path Finder");
+        while(queue.length>0){
+            for(let [k,v] of Object.entries(queue)){
+                console.log(k+":"+"point"+v.point+" path"+v.path+" dis:"+ v.dis);
+            }
+
+            var curr=queue[0].point;
+            var path=queue[0].path;
+            var dis=queue[0].dis;
+            console.log("Current Node"+ curr+" Path"+ path+" distance:" +dis);
+            if(curr==clusterHeads[keys[keys.length-1]].name){
+                console.log("GOAL FOUND");
+                console.log("Path cost:"+dis);
+                path.push(curr);
+                printPath(path);
+                break;
+            }
+            visited.push(curr);
+            queue.splice(0,1);
+            //alert(Object.keys(adj));
+            //alert(curr);
+            //alert(Object.keys(adj)[0]);
+            var a=adj[String(curr)];
+            for(let [k,v] of Object.entries(a)){
+                console.log(k+" : "+v);
+                if(visited.indexOf(k)==-1){
+                    var pth=path.slice(0);
+                    pth.push(curr);
+                    queue.push({"point":k,"path":pth,"dis":dis+parseFloat(v)});
+                    console.log("Point Loaded");
+                    console.log({"point":k,"path":pth,"dis":dis+parseFloat(v)});
+                }
+
+            }
+        }
+    }
+}
+function printPath(path){
+    console.log("Path");
+    for(var i=0;i<path.length;i++){
+        console.log(path[i]);
+    }
 }
 
 function buildAdj(){
     var keys = Object.keys(clusterHeads);
-    var a=[];
+    var a={};
     for(var i=0;i<keys.length;i++){
-        a=[];
-        for(var k=0;keys.length;j++){
-            a.push(distance(clusterHeads[keys[i]],clusterHeads[keys[k]]));
+        a={};
+        var x=0;
+        if(i==0){
+            x=1;
         }
-        adj.push(a);        
+        for(var k=0;k<keys.length-x;k++){
+            //alert(clusterHeads[keys[k]].name);
+            var name=clusterHeads[keys[k]].name;
+            a[name] = getDistance(clusterHeads[keys[i]],clusterHeads[keys[k]]);
+        }
+        var nm=clusterHeads[keys[i]].name;
+        adj[nm]=a;        
     }
+    //console.log(adj);
+    /*var c=1;
+    for(let [key, value] of Object.entries(adj)){
+        var s=c++ + "Line\n";
+        for(let [k,v] of Object.entries(value)){
+            s+=v+"  ";
+        }
+        console.log(s);
+    }
+    */
+   for(let [k,v] of Object.entries(adj)){
+        console.log(k+": ADJ\n");
+        for(let [k1,v1] of Object.entries(v)){
+            console.log(k1+":"+v1);
+        }
+   }
 }
 function pushEdge(p1,p2,dis){
     

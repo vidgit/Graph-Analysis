@@ -61,11 +61,12 @@
 </head>
 <script type="text/javascript" src="filereader.js"></script>
 <script type="text/javascript" src="graphutil.js"></script>
+<script src="graph.js"></script>
 <body>
 
 <button class="button" onclick="cluster()">Cluster</button>
 <button class="button">Salesman</button>
-<button class="button">Travel</button>
+<button class="button" onclick="overlay()">Travel</button>
 <button class="button" onclick="save()">Save</button>
 <div id="map"></div>
     <script src="FileSaver.js"></script>
@@ -121,7 +122,7 @@
             position: latLng,
             map: map
         });
-        map.panTo(latLng);
+        //map.panTo(latLng);
         var value = marker.getPosition().toString().replace(/[()]/g, '').split(",");
         //alert(value);
         var number = locations.length+1;
@@ -129,7 +130,7 @@
         locations.push(pushvalue);
         //console.log(locations);
         var point={
-            "name":number,
+            "name":number+"",
             "lat":value[0].slice(0,5),
             "long":value[1].slice(1,6),
             "isClustered":false,
