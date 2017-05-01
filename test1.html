@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+<meta name="description" content="Free fastest roundtrip planner for trips with multiple destinations. Up to 100 stops. Send computed route to TomTom or Garmin GPS.">
+<title>OptiMap | Route Planner for Google Maps</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel="stylesheet" href="jquery-ui.min.css">
+<link rel="stylesheet" href="style1.css"  type="text/css" media="screen">
+<link rel="stylesheet" href="print1.css"  type="text/css" media="print">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="BpTpSolver.js"></script>
+<script type="text/javascript" src="directions-export.js"></script>
+<script type="text/javascript" src="tsp.js"></script>
+<script type="text/javascript">
+jQuery.noConflict();
+
+function onBodyLoad() {
+  google.load("maps", "3.26", { callback: init, other_params: "key=AIzaSyAD0SAXDhDL_OunUV2eOGovipUGtKSs8wk" });
+}
+
+function init() {
+	if (google.loader.ClientLocation != null) {
+		latLng = new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
+		loadAtStart(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude, 8);
+	} else {
+		loadAtStart(37.4419, -122.1419, 8);
+	}
+}
+
+function toggle(divId) {
+  var divObj = document.getElementById(divId);
+  if (divObj.innerHTML == "") {
+    divObj.innerHTML = document.getElementById(divId + "_hidden").innerHTML;
+    document.getElementById(divId + "_hidden").innerHTML = "";
+  } else {
+    document.getElementById(divId + "_hidden").innerHTML = divObj.innerHTML;
+    divObj.innerHTML = "";
+  }
+}
+
+function save() {
+  var waypoints = tsp.getWaypoints();
+  var addresses = tsp.getAddresses();
+  var labels = tsp.getLabels();
+  var storeObj = {};
+  storeObj.destinations = new Array();
+  storeObj.route = new Array();
+  storeObj.mode = 0;
+  storeObj.walk = (document.getElementById('walking').checked ? 1 : 0);
+  storeObj.bike = (document.getElementById('bicycling').checked ? 1 : 0);
+  storeObj.avoid = (document.getElementById('avoidHighways').checked ? 1 : 0);
+  storeObj.avoidTolls = (document.getElementById('avoidTolls').checked ? 1 : 0);
+  storeObj.metricUnits = (document.getElementById('metricUnits').checked ? 1 : 0);
+  for (var i = 0; i < waypoints.length; ++i) {
+    storeObj.destinations.push({ geo: { lat: waypoints[i].lat(), lng: waypoints[i].lng() } });
+    if (addresses[i] != null && addresses[i] != "") {
+      storeObj.destinations[i]['addr'] = addresses[i];
+    }
+    if (labels[i] != null && labels[i] != "") {
+      storeObj.destinations[i]['label'] = labels[i];
+    }
+  }
+  var order = tsp.getOrder();
+  if (order != null) {
+    for (var j = 0; j < order.length; ++j) {
+      var i = order[j];
+      storeObj.route.push({ geo: { lat: waypoints[i].lat(), lng: waypoints[i].lng() } });
+      if (addresses[i] != null && addresses[i] != "") {
+        storeObj.route[j]['addr'] = addresses[i];
+      } else {
+      }
+      if (labels[i] != null && labels[i] != "") {
+        storeObj.route[j]['label'] = labels[i];
+      }
+    }
+  }
+
+  jQuery.post('store.php', JSON.stringify(storeObj), function(data) {
+    jQuery('#saveLink').val('gebweb.net/optimap/index.php?id=' + data.id);
+    jQuery('#saveLink').select();
+    jQuery('#dialogSave').dialog("open");
+  }, 'json');
+}
+
+jQuery(function() {
+  jQuery( "#accordion" ).accordion({
+    collapsible: true,
+	  heightStyle: "content",
+	  clearStyle: true
+  });
+  jQuery("input:button").button();
+  jQuery("#dialogProgress" ).dialog({
+    height: 140,
+	  modal: true,
+	  autoOpen: false
+  });
+  jQuery("#progressBar").progressbar({ value: 0 });
+  jQuery("#dialogTomTom" ).dialog({
+    height: 480,
+	width: 640,
+	modal: true,
+	autoOpen: false
+  });
+  jQuery("#dialogGarmin" ).dialog({
+    height: 480,
+	width: 640,
+	modal: true,
+	autoOpen: false
+  });
+  jQuery('#dialogSave').dialog({
+    height: 200,
+    width: 480,
+    modal: true,
+    autoOpen: false,
+    buttons : {
+      Ok: function() {
+        jQuery(this).dialog("close");
+      }
+    }
+  });
+  jQuery('#dialogSetLabel').dialog({
+    height: 200,
+    width: 480,
+    modal: true,
+    autoOpen: false});
+  jQuery('#setLabelCancel').click(function() {
+    jQuery('#dialogSetLabel').dialog("close");
+  });
+  jQuery('.myMap').height(jQuery(window).height() - 100);
+});
+
+(function() {
+  var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+  po.src = 'https://apis.google.com/js/plusone.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+})();
+
+</script>
+
+</head>
+
+<body onLoad="onBodyLoad()">
+<div id="fb-root"></div>
+
+<div class='container-fluid'>
+
+
+<!-- /33522877/dyn-header -->
+<div class='row noprint'>
+  <div id='div-gpt-ad-1469429582783-0' class='noprint col-md-12'></div>
+</div>
+
+<div class='row'>
+<div id="leftPanel" class='col-sm-6 col-md-5 col-lg-4 noprint'>
+  <div id="accordion" class='hidden'>
+
+    <h3><a href="#" class='accHeader'>Travel Options</a></h3>
+    <div>
+      <form name="travelOpts">
+      <input id='walking' type='checkbox'/> Walking<br>
+<input id='bicycling' type='checkbox'/> Bicycling<br>
+<input id='avoidHighways' type='checkbox'/> Avoid highways<br>
+<input id='avoidTolls' type='checkbox'/> Avoid toll roads<br>
+<input id='metricUnits' type='checkbox'/> Metric units (km)
+      </form>
+    </div>
+
+    <h3><a href="#" class='accHeader'>Export</a></h3>
+    <div >
+      <div id="exportGoogle"></div>
+      <div id="exportDataButton"></div>
+      <div id="exportData"></div>
+      <div id="exportLabelButton"></div>
+      <div id="exportLabelData"></div>
+      <div id="exportAddrButton"></div>
+      <div id="exportAddrData"></div>
+      <div id="exportOrderButton"></div>
+      <div id="exportOrderData"></div>
+      <div id="garmin"></div>
+      <div id="tomtom"></div>
+      <div id="durations" class="pathdata"></div>
+      <div id="durationsData"></div>
+    </div>
+
+    <h3><a href="#" class='accHeader'>Edit Route</a></h3>
+    <div>
+      <div id="routeDrag"></div>
+      <div id="reverseRoute"></div>
+    </div>
+
+    
+    
+    </div>
+
+    <input class="calcButton" type="button" value="Calculate Fastest Roundtrip" onClick="directions(0, document.forms['travelOpts'].walking.checked, document.forms['travelOpts'].bicycling.checked, document.forms['travelOpts'].avoidHighways.checked, document.forms['travelOpts'].avoidTolls.checked, document.forms['travelOpts'].metricUnits.checked)">
+    <input class="calcButton" type="button" value="Calculate Fastest A-Z Trip" onClick="directions(1, document.forms['travelOpts'].walking.checked, document.forms['travelOpts'].bicycling.checked, document.forms['travelOpts'].avoidHighways.checked, document.forms['travelOpts'].avoidTolls.checked, document.forms['travelOpts'].metricUnits.checked)">
+    <input class="calcButton" type='button' value='Start Over Again' onClick='startOver()'>
+
+  <div id="socialShare">
+    <div id="googlePlusShare">
+      <g:plusone annotation="inline" width="400"></g:plusone>
+    </div>
+    <div id="facebookShare">
+      <div class="fb-like" data-send="true" data-layout="button_count" data-width="400" data-show-faces="true" data-font="arial"></div>
+    </div>
+    </div>
+</div>
+
+<div class='col-sm-6 col-md-7 col-lg-8 col-print-12'>
+  <div id="map" class="myMap"></div>
+  <div id="path" class="pathdata"></div>
+  <div id="my_textual_div"></div>
+  
+  </div>
+</div>
+
+</div>  
+
+<!-- Hidden stuff -->
+<div id="bulkLoader_hidden" class='hidden'>
+  <form name="listOfLocations" onSubmit="clickedAddList(); return false;">
+    <textarea name="inputList" rows="10" cols="70">One destination per line</textarea><br>
+    <input type="button" value="Add list of locations" onClick="clickedAddList()">
+  </form>
+</div>
+<div id="exportData_hidden" class='hidden'></div>
+<div id="exportLabelData_hidden" class='hidden'></div>
+<div id="exportAddrData_hidden" class='hidden'></div>
+<div id="exportOrderData_hidden" class='hidden'></div>
+<div id="durationsData_hidden" class='hidden'></div>
+
+<div id="dialogProgress" title="Calculating route...">
+  <div id="progressBar"></div>
+</div>
+
+<div id="dialogTomTom" title="Export to TomTom">
+  <iframe name='tomTomIFrame' style='width: 580px; height: 400px'></iframe> 
+</div>
+
+<div id="dialogGarmin" title="Export to Garmin">
+  <iframe name='garminIFrame' style='width: 580px; height: 400px'></iframe>
+</div>
+
+<div id="dialogSave" title="Your route link">
+  <p>You can re-open this route later by going to
+    <input id='saveLink' type='text' style="width: 100%;" value=""/></p>
+</div>
+
+<div id="dialogSetLabel" title="Set name">
+  <p>Enter name for location: <input id='setLabelInput' type='text' style="width: 100%;" value=""/></p>
+  <input id='setLabelCancel' type='button' value='Cancel'/>
+  <input id='setLabelOk' type='button' value='Ok'/>
+</div>
+
+</div>
+
+<!-- Non-blocking scripts -->
+<script src="jquery-ui.min.js"></script>
+
+
+<script type='text/javascript'>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+  (function() {
+    var gads = document.createElement('script');
+    gads.async = true;
+    gads.type = 'text/javascript';
+    var useSSL = 'https:' == document.location.protocol;
+    gads.src = (useSSL ? 'https:' : 'http:') +
+      '//www.googletagservices.com/tag/js/gpt.js';
+    var node = document.getElementsByTagName('script')[0];
+    node.parentNode.insertBefore(gads, node);
+  })();
+</script>
+
+<script type='text/javascript'>
+  googletag.cmd.push(function() {
+    var mapping = googletag.sizeMapping().
+      addSize([1024, 768], [970, 90]).
+      addSize([770, 690], [728, 90]).
+      addSize([490, 480], [468, 60]).
+      addSize([0, 0], [320, 50]).
+      // Fits browsers of any size smaller than 490 x 480
+      build();
+    googletag.defineSlot('/33522877/dyn-header', [[468, 60], [970, 90], [728, 90], [320, 50]], 'div-gpt-ad-1469429582783-0').defineSizeMapping(mapping).addService(googletag.pubads());
+    googletag.pubads().enableSingleRequest();
+    googletag.enableServices();
+  });
+</script>
+<script type='text/javascript'>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-1469429582783-0'); });
+</script>
+<!-- End DoubleClick -->
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+
+div.my_textual_div {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.myMap {
+    width: 100%;
+    height: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.pathData {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+div.centered-directions {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    background: #a7a7a7;
+}
+
+
+span.red {
+    color: #ca0000;
+}
+
+.noprint {
+    display: none !important;
+}
+
+.col-print-12 {
+    width: 100% !important;
+}

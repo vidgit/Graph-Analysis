@@ -1,0 +1,46 @@
+body {
+    margin:0;
+    }
+
+div.canvas {
+    margin-top: 2px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+
+div.myMap {
+    width: 100%;
+    height: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2px;
+}
+
+
+input.calcButton {
+    width: 200pt;
+}
+
+
+button.ui-button-icon-only {
+    height: 100%;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+.calcButton {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    width: 25%;
+    }
